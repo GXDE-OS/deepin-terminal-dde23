@@ -1,0 +1,143 @@
+From: Đoàn Trần Công Danh <congdanhqx@gmail.com>
+Date: Sat, 4 Apr 2020 10:23:18 +0700
+Subject: vala: libify raw_data conversion for Terminal::feed_child
+
+In a later patch, we will add a conditional build for API change
+from VTE 0.60.
+
+Forwarded: https://github.com/linuxdeepin/deepin-terminal/pull/221
+Bug-Debian: https://bugs.debian.org/954581
+---
+ lib/utils.vala            |  4 ++++
+ widget/command_panel.vala |  2 +-
+ widget/terminal.vala      | 20 ++++++++++----------
+ widget/workspace.vala     |  2 +-
+ 4 files changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/lib/utils.vala b/lib/utils.vala
+index 11c782e..96d7970 100644
+--- a/lib/utils.vala
++++ b/lib/utils.vala
+@@ -556,4 +556,8 @@ namespace Utils {
+ 
+         return command;
+     }
++
++    public char[] to_raw_data(string str) {
++        return str.to_utf8();
++    }
+ }
+diff --git a/widget/command_panel.vala b/widget/command_panel.vala
+index 5bbcf5d..f1380fa 100644
+--- a/widget/command_panel.vala
++++ b/widget/command_panel.vala
+@@ -299,7 +299,7 @@ namespace Widgets {
+         public void execute_command(string command) {
+             Term focus_term = workspace_manager.focus_workspace.get_focus_term(workspace_manager.focus_workspace);
+             var command_string = "%s\n".printf(command);
+-            focus_term.term.feed_child(command_string.to_utf8());
++            focus_term.term.feed_child(Utils.to_raw_data(command_string));
+ 
+             workspace.hide_command_panel();
+             if (focus_widget != null) {
+diff --git a/widget/terminal.vala b/widget/terminal.vala
+index 0b5f024..339e296 100644
+--- a/widget/terminal.vala
++++ b/widget/terminal.vala
+@@ -605,7 +605,7 @@ namespace Widgets {
+                         }
+                         upload_command = upload_command + "\n";
+ 
+-                        this.term.feed_child(upload_command.to_utf8());
++                        this.term.feed_child(Utils.to_raw_data(upload_command));
+ 
+                         return false;
+                     });
+@@ -633,7 +633,7 @@ namespace Widgets {
+                         GLib.Timeout.add(100, () => {
+                                 // NOTE: Use quote around $file to avoid escape filepath.
+                                 string command = "read -e -a files -p \"%s: \"; sz \"${files[@]}\"\n".printf(_("Type path to download file"));
+-                                this.term.feed_child(command.to_utf8());
++                                this.term.feed_child(Utils.to_raw_data(command));
+ 
+                                 enter_sz_command = true;
+ 
+@@ -678,17 +678,17 @@ namespace Widgets {
+                     GLib.Timeout.add(100, () => {
+                             // Switch directory in zssh.
+                             string switch_command = "cd %s\n".printf(save_file_directory);
+-                            this.term.feed_child(switch_command.to_utf8());
++                            this.term.feed_child(Utils.to_raw_data(switch_command));
+ 
+                             // Do rz command to download file.
+                             GLib.Timeout.add(100, () => {
+                                     string download_command = "rz\n";
+-                                    this.term.feed_child(download_command.to_utf8());
++                                    this.term.feed_child(Utils.to_raw_data(download_command));
+ 
+                                     // Press enter automatically.
+                                     GLib.Timeout.add(100, () => {
+                                             string enter_command = "\n";
+-                                            this.term.feed_child(enter_command.to_utf8());
++                                            this.term.feed_child(Utils.to_raw_data(enter_command));
+ 
+                                             return false;
+                                         });
+@@ -973,7 +973,7 @@ namespace Widgets {
+                             foreach (unowned string option in command_config_file.get_groups ()) {
+                                 if (keyname == command_config_file.get_value(option, "Shortcut")) {
+                                     var command_string = "%s\n".printf(command_config_file.get_value(option, "Command"));
+-                                    term.feed_child(command_string.to_utf8());
++                                    term.feed_child(Utils.to_raw_data(command_string));
+ 
+                                     return true;
+                                 }
+@@ -1084,7 +1084,7 @@ namespace Widgets {
+                             }
+                             upload_command = upload_command + "\n";
+ 
+-                            this.term.feed_child(upload_command.to_utf8());
++                            this.term.feed_child(Utils.to_raw_data(upload_command));
+ 
+                             return false;
+                         });
+@@ -1099,7 +1099,7 @@ namespace Widgets {
+                     }
+ 
+                     string uris_s = string.joinv("", uris);
+-                    this.term.feed_child(uris_s.to_utf8());
++                    this.term.feed_child(Utils.to_raw_data(uris_s));
+                 }
+ 
+                 break;
+@@ -1108,7 +1108,7 @@ namespace Widgets {
+                 var data = selection_data.get_text ();
+ 
+                 if (data != null) {
+-                    this.term.feed_child(data.to_utf8());
++                    this.term.feed_child(Utils.to_raw_data(data));
+                 }
+ 
+                 break;
+@@ -1581,7 +1581,7 @@ namespace Widgets {
+                 if (term != null) {
+                     string login_command = "expect -f " + tmpfile.get_path() + "\n";
+                     expect_file_path = tmpfile.get_path();
+-                    term.feed_child(login_command.to_utf8());
++                    term.feed_child(Utils.to_raw_data(login_command));
+                 }
+             } catch (Error e) {
+                 stderr.printf("login_server: %s\n", e.message);
+diff --git a/widget/workspace.vala b/widget/workspace.vala
+index 6a8784b..83b45e3 100644
+--- a/widget/workspace.vala
++++ b/widget/workspace.vala
+@@ -141,7 +141,7 @@ namespace Widgets {
+                     if (term_dir.length > 0) {
+                         Term new_focus_term = get_focus_term(this);
+                         string switch_command = "cd %s\n".printf(term_dir);
+-                        new_focus_term.term.feed_child(switch_command.to_utf8());
++                        new_focus_term.term.feed_child(Utils.to_raw_data(switch_command));
+                     }
+ 
+                     return false;

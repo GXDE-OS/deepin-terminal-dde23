@@ -1,0 +1,19 @@
+From: Yanhao Mo <yanhaocs@gmail.com>
+Date: Tue, 26 Feb 2019 14:05:28 +0800
+Subject: get rid of lintian warning desktop-entry-invalid-category
+
+---
+ deepin-terminal.desktop | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/deepin-terminal.desktop b/deepin-terminal.desktop
+index b24d632..8968e83 100644
+--- a/deepin-terminal.desktop
++++ b/deepin-terminal.desktop
+@@ -1,5 +1,5 @@
+ [Desktop Entry]
+-Categories=GNOME;GTK;DDE;Utility;System;TerminalEmulator;
++Categories=GNOME;GTK;Utility;System;TerminalEmulator;
+ Comment=Use the command line
+ Exec=deepin-terminal
+ GenericName=Terminal

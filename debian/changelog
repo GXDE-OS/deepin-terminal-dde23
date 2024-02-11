@@ -1,0 +1,107 @@
+deepin-terminal (5.0.0+ds1-3) unstable; urgency=medium
+
+  * debian/patches:
+    + Add 0004-basic-wayland-support patch file. (Closes: #987933, #894323)
+  * debian/control:
+    + Add Arun Kumar Pariyar to uploaders list.
+
+ -- Arun Kumar Pariyar <openarungeek@gmail.com>  Mon, 03 May 2021 00:46:19 +0545
+
+deepin-terminal (5.0.0+ds1-2) unstable; urgency=high
+
+  * debian/patches: Add upstream PR to fix FTBFS with new libvte
+    (Closes: #954581)
+  * debian/control: Bump Standards-Version to 4.5.0.
+
+ -- Boyuan Yang <byang@debian.org>  Thu, 23 Apr 2020 19:18:02 -0400
+
+deepin-terminal (5.0.0+ds1-1) unstable; urgency=medium
+
+  * New upstream release 5.0.0+ds1. 
+  * debian/control: Bump Standards-Version to 4.4.1.
+
+ -- Boyuan Yang <byang@debian.org>  Fri, 15 Nov 2019 10:47:51 -0500
+
+deepin-terminal (3.2.1.1+ds1-1) unstable; urgency=medium
+
+  * New upstream version 3.2.1.1+ds1
+  * d/patches: Add a patch to get rid of lintian warning:
+    desktop-entry-invalid-category.
+
+ -- Yanhao Mo <yanhaocs@gmail.com>  Tue, 26 Feb 2019 14:00:19 +0800
+
+deepin-terminal (3.2+ds1-1) unstable; urgency=medium
+
+  * New upstream version 3.2.
+  * Revert upstream commit about adding Debian Stretch support back
+    (vendoring libraries).
+  * debian/control:
+    + Update my uploader email address and use @debian.org one.
+    + Build-depend on debhelper-compat (= 12) instead of using
+      debian/compat file.
+    + Bump Standards-Version to 4.3.0.
+  * debian/rules:
+    + Add back vala workarounds.
+  * debian/watch: Add version mangling.
+
+ -- Boyuan Yang <byang@debian.org>  Fri, 11 Jan 2019 10:22:48 -0500
+
+deepin-terminal (3.0.8-1) unstable; urgency=medium
+
+  * Update d/watch
+  * Remove d/patches, applyed by upstream.
+  * New upstream version 3.0.8
+
+ -- Yanhao Mo <yanhaocs@gmail.com>  Wed, 24 Oct 2018 09:50:12 +0800
+
+deepin-terminal (3.0.7-1) unstable; urgency=medium
+
+  * New upstream version 3.0.7
+  * Bump Standards-Version to 4.2.1 (no changes needed).
+  * drop d/patch/0002-use-system-lib, applyed by upstream.
+  * d/copyright: remove license info of vapi/xcb.vapi.
+  * d/watch: simplify it by using "dversionmangle=auto".
+
+ -- Yanhao Mo <yanhaocs@gmail.com>  Sun, 14 Oct 2018 18:38:29 +0800
+
+deepin-terminal (3.0.3+ds-1) unstable; urgency=medium
+
+  * New upstream version 3.0.3+ds
+  * Bump Standards-Version to 4.2.0 (no changes needed).
+
+ -- Yanhao Mo <yanhaocs@gmail.com>  Mon, 20 Aug 2018 15:23:39 +0800
+
+deepin-terminal (3.0.1+ds-1) unstable; urgency=medium
+
+  * New upstream version 3.0.1+ds
+  * Bump Standards-Version to 4.1.5 (no changes needed).
+
+ -- Yanhao Mo <yanhaocs@gmail.com>  Sat, 21 Jul 2018 11:16:43 +0800
+
+deepin-terminal (3.0.0+ds-2) unstable; urgency=medium
+
+  * Add missing runtime dependency zssh (Closes: #900644).
+
+ -- Yanhao Mo <yanhaocs@gmail.com>  Thu, 14 Jun 2018 08:44:42 +0800
+
+deepin-terminal (3.0.0+ds-1) unstable; urgency=medium
+
+  [ Yanhao Mo ]
+  * New upstream release.
+  * d/control: Add new uploader Yanhao Mo <yanhaocs@gmail.com>.
+  * d/patches: modify patches to adapt to new upstream version.
+  * d/rules: Refresh to build new package.
+  * d/copyright: Exclude 3rdparty/ directory.
+  * d/source/lintian-overrides: No need to override anything, delete it.
+  * Bump Standards-Version to 4.1.4 (No changes needed).
+
+  [ Boyuan Yang ]
+  * d/rules: Use "dh_missing --fail-missing".
+
+ -- Boyuan Yang <073plan@gmail.com>  Thu, 17 May 2018 21:05:16 +0800
+
+deepin-terminal (2.9.2-1) unstable; urgency=medium
+
+  * Initial release (Closes: #870446)
+
+ -- Yangfl <mmyangfl@gmail.com>  Sun, 18 Mar 2018 12:06:02 +0800

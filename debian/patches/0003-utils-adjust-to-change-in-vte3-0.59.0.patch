@@ -1,0 +1,47 @@
+From: Đoàn Trần Công Danh <congdanhqx@gmail.com>
+Date: Sat, 4 Apr 2020 10:53:14 +0700
+Subject: utils: adjust to change in vte3>0.59.0
+
+vte3 has changed the parameter to Terminal::feed_child from char[]
+to uint8[]
+
+Forwarded: https://github.com/linuxdeepin/deepin-terminal/pull/221
+Bug-Debian: https://bugs.debian.org/954581
+---
+ CMakeLists.txt | 4 ++++
+ lib/utils.vala | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e93e38d..8b45393 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -30,6 +30,10 @@ option(USE_VENDOR_LIB "Backport support for debian stretch" ON)
+ 
+ if (NOT USE_VENDOR_LIB)
+ pkg_check_modules(VTE REQUIRED vte-2.91)
++# There're 3 releases for 0.59.x, only 0.59.0 keeps old behaviour
++if("${VTE_VERSION}" VERSION_GREATER "0.59.0")
++    list(APPEND ARGS_DEFINITIONS "VTE_0_60")
++endif()
+ endif()
+ 
+ if (NOT DEFINED VERSION)
+diff --git a/lib/utils.vala b/lib/utils.vala
+index 96d7970..b4558a3 100644
+--- a/lib/utils.vala
++++ b/lib/utils.vala
+@@ -557,7 +557,13 @@ namespace Utils {
+         return command;
+     }
+ 
++#if VTE_0_60
++    public uint8[] to_raw_data(string str) {
++        return str.data;
++    }
++#else
+     public char[] to_raw_data(string str) {
+         return str.to_utf8();
+     }
++#endif
+ }

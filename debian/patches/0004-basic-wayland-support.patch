@@ -1,0 +1,376 @@
+From: Gary Wang <wzc782970009@gmail.com>
+Date: Sun, 12 Jan 2020 21:30:47 +0800
+Subject: [PATCH] feat: basic wayland support
+Origin: upstream, https://github.com/linuxdeepin/deepin-terminal-gtk/commit/4797cc462a803726a0001ecc2e8e5b7d10d013cd
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=987933
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=894323
+
+---
+ lib/utils.vala                |  55 ++++++++++++++---
+ lib/xutils.vala               | 113 ----------------------------------
+ widget/quake_window.vala      |  11 +---
+ widget/window.vala            |  16 ++---
+ widget/window_event_area.vala |  32 +++++-----
+ 5 files changed, 75 insertions(+), 152 deletions(-)
+ delete mode 100644 lib/xutils.vala
+
+diff --git a/lib/utils.vala b/lib/utils.vala
+index bd1b2ec5..07e3f399 100644
+--- a/lib/utils.vala
++++ b/lib/utils.vala
+@@ -3,8 +3,10 @@
+  *
+  * Copyright (C) 2011 ~ 2018 Deepin, Inc.
+  *               2011 ~ 2018 Wang Yong
++ *               2019 ~ 2020 Gary Wang
+  *
+  * Author:     Wang Yong <wangyong@deepin.com>
++ *             Gary Wang <wzc782970009@gmail.com>
+  * Maintainer: Wang Yong <wangyong@deepin.com>
+  *
+  * This program is free software: you can redistribute it and/or modify
+@@ -186,18 +188,53 @@ namespace Utils {
+         return alloc;
+     }
+ 
+-    public bool move_window(Gtk.Widget widget, Gdk.EventButton event, Gtk.Window window) {
+-        if (is_left_button(event)) {
+-            window.begin_move_drag(
+-                (int)event.button,
+-                (int)event.x_root,
+-                (int)event.y_root,
+-                event.time);
++    public bool move_window(Gtk.Widget widget, Gdk.EventButton event) {
++        if (is_primary_button(event)) {
++            widget.get_toplevel().get_window().begin_move_drag(
++                (int) event.button, 
++                (int) event.x_root,
++                (int) event.y_root,
++                event.time
++            );
+         }
+ 
+         return false;
+     }
+ 
++    public bool resize_window(Gtk.Widget widget, Gdk.EventButton event, Gdk.CursorType cursor_type) {
++        widget.get_toplevel().get_window().begin_resize_drag(
++            cursor_type_to_window_edge(cursor_type),
++            (int) event.button, 
++            (int) event.x_root, 
++            (int) event.y_root, 
++            event.time
++        );
++
++        return true;
++    }
++
++    public Gdk.WindowEdge? cursor_type_to_window_edge(Gdk.CursorType cursor_type) {
++        if (cursor_type == Gdk.CursorType.TOP_LEFT_CORNER) {
++            return WindowEdge.NORTH_WEST;
++        } else if (cursor_type == Gdk.CursorType.TOP_SIDE) {
++            return WindowEdge.NORTH;
++        } else if (cursor_type == Gdk.CursorType.TOP_RIGHT_CORNER) {
++            return WindowEdge.NORTH_EAST;
++        } else if (cursor_type == Gdk.CursorType.RIGHT_SIDE) {
++            return WindowEdge.EAST;
++        } else if (cursor_type == Gdk.CursorType.BOTTOM_RIGHT_CORNER) {
++            return WindowEdge.SOUTH_EAST;
++        } else if (cursor_type == Gdk.CursorType.BOTTOM_SIDE) {
++            return WindowEdge.SOUTH;
++        } else if (cursor_type == Gdk.CursorType.BOTTOM_LEFT_CORNER) {
++            return WindowEdge.SOUTH_WEST;
++        } else if (cursor_type == Gdk.CursorType.LEFT_SIDE) {
++            return WindowEdge.WEST;
++        }
++
++        return null;
++    }
++
+     public void toggle_max_window(Gtk.Window window) {
+         var window_state = window.get_window().get_state();
+         if (Gdk.WindowState.MAXIMIZED in window_state) {
+@@ -207,6 +244,10 @@ namespace Utils {
+         }
+     }
+ 
++    public bool is_primary_button(Gdk.EventButton event) {
++        return event.button == Gdk.BUTTON_PRIMARY;
++    }
++
+     public bool is_left_button(Gdk.EventButton event) {
+         return event.button == 1;
+     }
+diff --git a/lib/xutils.vala b/lib/xutils.vala
+deleted file mode 100644
+index 014c28ef..00000000
+--- a/lib/xutils.vala
++++ /dev/null
+@@ -1,113 +0,0 @@
+-/* -*- Mode: Vala; indent-tabs-mode: nil; tab-width: 4 -*-
+- * -*- coding: utf-8 -*-
+- *
+- * Copyright (C) 2011 ~ 2018 Deepin, Inc.
+- *               2011 ~ 2018 Wang Yong
+- *
+- * Author:     Wang Yong <wangyong@deepin.com>
+- * Maintainer: Wang Yong <wangyong@deepin.com>
+- *
+- * This program is free software: you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 3 of the License, or
+- * any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-namespace XUtils {
+-    public static int _NET_WM_MOVERESIZE_MOVE = 8;
+-    public static int _NET_WM_MOVERESIZE_SIZE_BOTTOM = 5;
+-    public static int _NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT = 6;
+-    public static int _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT = 4;
+-    public static int _NET_WM_MOVERESIZE_SIZE_LEFT = 7;
+-    public static int _NET_WM_MOVERESIZE_SIZE_RIGHT = 3;
+-    public static int _NET_WM_MOVERESIZE_SIZE_TOP = 1;
+-    public static int _NET_WM_MOVERESIZE_SIZE_TOPLEFT = 0;
+-    public static int _NET_WM_MOVERESIZE_SIZE_TOPRIGHT = 2;
+-
+-    public void seat_ungrab() {
+-        Gdk.Display gdk_display = Gdk.Display.get_default();
+-        var seat = gdk_display.get_default_seat();
+-        seat.ungrab();
+-    }
+-
+-    public void move_window(Gtk.Widget widget, int x, int y, int button) {
+-        seat_ungrab();
+-        send_message((int)((Gdk.X11.Window) widget.get_toplevel().get_window()).get_xid(),
+-                     (long) x,
+-                     (long) y,
+-                     _NET_WM_MOVERESIZE_MOVE,
+-                     button,
+-                     0  // this value must be 0, otherwise moveresize won't work.
+-                     );
+-    }
+-
+-    public void resize_window(Gtk.Widget widget, int x, int y, int button, Gdk.CursorType cursor_type) {
+-        int? action = cursor_type_to_action(cursor_type);
+-        if (action != null) {
+-            seat_ungrab();
+-            send_message((int)((Gdk.X11.Window) widget.get_toplevel().get_window()).get_xid(),
+-                         (long) x,
+-                         (long) y,
+-                         action,
+-                         button,
+-                         1
+-                         );
+-        }
+-    }
+-
+-    public int? cursor_type_to_action(Gdk.CursorType cursor_type) {
+-        if (cursor_type == Gdk.CursorType.TOP_LEFT_CORNER) {
+-            return _NET_WM_MOVERESIZE_SIZE_TOPLEFT;
+-        } else if (cursor_type == Gdk.CursorType.TOP_SIDE) {
+-            return _NET_WM_MOVERESIZE_SIZE_TOP;
+-        } else if (cursor_type == Gdk.CursorType.TOP_RIGHT_CORNER) {
+-            return _NET_WM_MOVERESIZE_SIZE_TOPRIGHT;
+-        } else if (cursor_type == Gdk.CursorType.RIGHT_SIDE) {
+-            return _NET_WM_MOVERESIZE_SIZE_RIGHT;
+-        } else if (cursor_type == Gdk.CursorType.BOTTOM_RIGHT_CORNER) {
+-            return _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT;
+-        } else if (cursor_type == Gdk.CursorType.BOTTOM_SIDE) {
+-            return _NET_WM_MOVERESIZE_SIZE_BOTTOM;
+-        } else if (cursor_type == Gdk.CursorType.BOTTOM_LEFT_CORNER) {
+-            return _NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT;
+-        } else if (cursor_type == Gdk.CursorType.LEFT_SIDE) {
+-            return _NET_WM_MOVERESIZE_SIZE_LEFT;
+-        }
+-
+-        return null;
+-    }
+-
+-    public void send_message(int xid, long x, long y, int action, int button, int secret_value) {
+-        weak X.Display display = Gdk.X11.get_default_xdisplay();
+-        weak X.Window xrootwindow = display.root_window(0);
+-
+-        X.Event event = X.Event();
+-
+-        event.xclient.type = X.EventType.ClientMessage;
+-        event.xclient.message_type = Gdk.X11.get_xatom_by_name("_NET_WM_MOVERESIZE");
+-        event.xclient.display = display;
+-        event.xclient.window = xid;
+-        event.xclient.format = 32;
+-        event.xclient.data.l[0] = x;
+-        event.xclient.data.l[1] = y;
+-        event.xclient.data.l[2] = action;
+-        event.xclient.data.l[3] = button;
+-        event.xclient.data.l[4] = secret_value;
+-
+-        display.send_event(
+-            xrootwindow,
+-            false,
+-            X.EventMask.SubstructureNotifyMask | X.EventMask.SubstructureRedirectMask,
+-            ref event);
+-
+-        display.flush();
+-    }
+-}
+diff --git a/widget/quake_window.vala b/widget/quake_window.vala
+index 3e5a065c..58d2dd33 100644
+--- a/widget/quake_window.vala
++++ b/widget/quake_window.vala
+@@ -24,7 +24,6 @@
+ using Gtk;
+ using Utils;
+ using Widgets;
+-using XUtils;
+ 
+ namespace Widgets {
+     public class QuakeWindow : Widgets.ConfigWindow {
+@@ -166,10 +165,7 @@ namespace Widgets {
+                                     e.device.get_position(null, out pointer_x, out pointer_y);
+ 
+                                     if (pointer_x != press_x || pointer_y != press_y) {
+-                                        pointer_x *= get_scale_factor();
+-                                        pointer_y *= get_scale_factor();
+-                                        resize_window(this, pointer_x, pointer_y, (int) e.button, Gdk.CursorType.BOTTOM_SIDE);
+-
++                                        Utils.resize_window(this, e, cursor_type);
+                                         return false;
+                                     } else {
+                                         return true;
+@@ -191,10 +187,7 @@ namespace Widgets {
+                                 e.device.get_position(null, out pointer_x, out pointer_y);
+ 
+                                 if (pointer_x != press_x || pointer_y != press_y) {
+-                                    pointer_x *= get_scale_factor();
+-                                    pointer_y *= get_scale_factor();
+-                                    resize_window(this, pointer_x, pointer_y, (int) e.button, Gdk.CursorType.BOTTOM_SIDE);
+-
++                                    Utils.resize_window(this, e, cursor_type);
+                                     return false;
+                                 } else {
+                                     return true;
+diff --git a/widget/window.vala b/widget/window.vala
+index 65513860..ad91526a 100644
+--- a/widget/window.vala
++++ b/widget/window.vala
+@@ -3,8 +3,10 @@
+  *
+  * Copyright (C) 2011 ~ 2018 Deepin, Inc.
+  *               2011 ~ 2018 Wang Yong
++ *               2019 ~ 2020 Gary Wang
+  *
+  * Author:     Wang Yong <wangyong@deepin.com>
++ *             Gary Wang <wzc782970009@gmail.com>
+  * Maintainer: Wang Yong <wangyong@deepin.com>
+  *
+  * This program is free software: you can redistribute it and/or modify
+@@ -26,7 +28,6 @@ using Config;
+ using Gtk;
+ using Utils;
+ using Wnck;
+-using XUtils;
+ using Widgets;
+ 
+ namespace Widgets {
+@@ -205,9 +206,7 @@ namespace Widgets {
+ 
+                             var cursor_type = get_frame_cursor_type(e.x_root, e.y_root);
+                             if (cursor_type != null) {
+-                                pointer_x *= get_scale_factor();
+-                                pointer_y *= get_scale_factor();
+-                                resize_window(this, pointer_x, pointer_y, (int) e.button, cursor_type);
++                                Utils.resize_window(this, e, cursor_type);
+                                 return true;
+                             }
+                         }
+@@ -223,9 +222,7 @@ namespace Widgets {
+ 
+                         var cursor_type = get_cursor_type(e.x_root, e.y_root);
+                         if (cursor_type != null) {
+-                            pointer_x *= get_scale_factor();
+-                            pointer_y *= get_scale_factor();
+-                            resize_window(this, pointer_x, pointer_y, (int) e.button, cursor_type);
++                            Utils.resize_window(this, e, cursor_type);
+                             return true;
+                         }
+                     }
+@@ -320,6 +317,11 @@ namespace Widgets {
+         }
+ 
+         public void update_blur_status(bool force_update=false) {
++            Gdk.Display current_display = get_window().get_display();
++            if ((current_display as Gdk.X11.Display) == null) {
++                return;
++            }
++            
+             try {
+                 int width, height;
+                 get_size(out width, out height);
+diff --git a/widget/window_event_area.vala b/widget/window_event_area.vala
+index 3693cb83..404d85e7 100644
+--- a/widget/window_event_area.vala
++++ b/widget/window_event_area.vala
+@@ -3,8 +3,10 @@
+  *
+  * Copyright (C) 2011 ~ 2018 Deepin, Inc.
+  *               2011 ~ 2018 Wang Yong
++ *               2019 ~ 2020 Gary Wang
+  *
+  * Author:     Wang Yong <wangyong@deepin.com>
++ *             Gary Wang <wzc782970009@gmail.com>
+  * Maintainer: Wang Yong <wangyong@deepin.com>
+  *
+  * This program is free software: you can redistribute it and/or modify
+@@ -23,7 +25,6 @@
+ 
+ using Gtk;
+ using Widgets;
+-using XUtils;
+ 
+ namespace Widgets {
+     public class WindowEventArea : Gtk.EventBox {
+@@ -95,23 +96,22 @@ namespace Widgets {
+                     e.device.get_position(null, out press_x, out press_y);
+ 
+                     GLib.Timeout.add(10, () => {
+-                            // Send 'move_window' event to xserver once find user first do drag.
+-                            if (is_press) {
+-                                int pointer_x, pointer_y;
+-                                e.device.get_position(null, out pointer_x, out pointer_y);
+-
+-                                if (pointer_x != press_x || pointer_y != press_y) {
+-                                    pointer_x *= get_scale_factor();
+-                                    pointer_y *= get_scale_factor();
+-                                    move_window(this, pointer_x, pointer_y, (int) e.button);
+-                                    return false;
+-                                } else {
+-                                    return true;
+-                                }
+-                            } else {
++                        // blumia: should use begin_move_drag instead of send event to X
++                        //         so it should also works under wayland :)
++                        if (is_press) {
++                            int pointer_x, pointer_y;
++                            e.device.get_position(null, out pointer_x, out pointer_y);
++
++                            if (pointer_x != press_x || pointer_y != press_y) {
++                                Utils.move_window(this, e);
+                                 return false;
++                            } else {
++                                return true;
+                             }
+-                        });
++                        } else {
++                            return false;
++                        }
++                    });
+ 
+ 
+                     var child = get_child_at_pos(drawing_area, (int) e.x, (int) e.y);

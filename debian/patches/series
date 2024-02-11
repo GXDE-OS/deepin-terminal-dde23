@@ -1,0 +1,4 @@
+0001-get-rid-of-lintian-warning-desktop-entry-invalid-cat.patch
+0002-vala-libify-raw_data-conversion-for-Terminal-feed_ch.patch
+0003-utils-adjust-to-change-in-vte3-0.59.0.patch
+0004-basic-wayland-support.patch

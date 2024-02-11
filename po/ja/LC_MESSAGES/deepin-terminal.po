@@ -1,0 +1,712 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# luozengbin <jalen.cn@gmail.com>, 2017
+# blend <baker1989@126.com>, 2017
+# 李洪武 <lihongwu1987@gmail.com>, 2017
+# Maggie Liu <maggie.liufei@gmail.com>, 2017
+# ふうせん Fu-sen. | BALLOON a.k.a. Fu-sen., 2017
+# 月下 立花 <body_1234567_1206@yahoo.co.jp>, 2017
+# Pedro Lopes <pedrocvl112358@gmail.com>, 2018
+# Hinaloe <hina@hinaloe.net>, 2019
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-04-26 13:06+0800\n"
+"PO-Revision-Date: 2017-02-04 05:38+0000\n"
+"Last-Translator: Hinaloe <hina@hinaloe.net>, 2019\n"
+"Language-Team: Japanese (https://www.transifex.com/linuxdeepin/teams/3976/ja/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../widget/terminal.vala:1214
+msgid ""
+"\n"
+"Command has been completed, press ENTER to exit the terminal."
+msgstr ""
+"\n"
+"コマンドが完了しました。ENTERを押すとターミナルを終了します。"
+
+#: ../widget/appbar.vala:129
+msgid "About"
+msgstr "バージョン情報"
+
+#: ../widget/about_widget.vala:81
+msgid "Acknowledgments"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:352 ../widget/command_dialog.vala:197
+msgid "Add"
+msgstr "追加"
+
+#: ../widget/command_dialog.vala:126
+msgid "Add Command"
+msgstr "コマンドを追加"
+
+#: ../widget/remote_server_dialog.vala:154
+msgid "Add Server"
+msgstr "サーバーを追加"
+
+#: ../widget/command_panel.vala:311
+msgid "Add command"
+msgstr "コマンドを追加"
+
+#: ../widget/remote_panel.vala:468
+msgid "Add server"
+msgstr "サーバーを追加"
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Address"
+msgstr "アドレス"
+
+#: ../widget/remote_server_dialog.vala:190
+msgid "Address:"
+msgstr "アドレス:"
+
+#: ../widget/preference_slidebar.vala:74 ../widget/preference_slidebar.vala:81
+#: ../widget/preference.vala:334 ../widget/preference.vala:346
+#: ../widget/config_window.vala:366
+msgid "Advanced"
+msgstr "高度"
+
+#: ../widget/remote_server_dialog.vala:337
+msgid "Advanced options"
+msgstr "高度なオプション"
+
+#: ../widget/remote_server_dialog.vala:426 ../widget/command_dialog.vala:249
+msgid "Are you sure you want to delete %s?"
+msgstr "%sを削除してもよろしいですか？"
+
+#: ../widget/confirm_dialog.vala:130
+msgid "Are you sure you want to exit?"
+msgstr "終了しますか？"
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Backspace key"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:321
+msgid "Backspace key:"
+msgstr ""
+
+#: ../widget/preference_slidebar.vala:55 ../widget/preference.vala:249
+msgid "Basic"
+msgstr "ベーシック"
+
+#: ../widget/preference.vala:410
+msgid "Blur background"
+msgstr "背景のブラー"
+
+#: ../widget/remote_server_dialog.vala:347
+#: ../widget/remote_server_dialog.vala:427 ../widget/confirm_dialog.vala:130
+#: ../widget/terminal.vala:590 ../widget/terminal.vala:618
+#: ../widget/terminal.vala:652 ../widget/file_button.vala:69
+#: ../widget/command_dialog.vala:192 ../widget/command_dialog.vala:250
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Certificate"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:261
+msgid "Certificate:"
+msgstr ""
+
+#: ../widget/terminal.vala:387 ../widget/config_window.vala:343
+msgid "Close other windows"
+msgstr "他のウィンドウを閉じる"
+
+#: ../widget/preference.vala:332
+msgid "Close other windows:"
+msgstr "他のウインドウを閉じる:"
+
+#: ../widget/terminal.vala:385 ../widget/config_window.vala:342
+msgid "Close window"
+msgstr "ウインドウを閉じる"
+
+#: ../widget/preference.vala:331
+msgid "Close window:"
+msgstr "ウインドウを閉じる:"
+
+#: ../widget/config_window.vala:331
+msgid "Close workspace"
+msgstr "ワークスペースを閉じる"
+
+#: ../widget/preference.vala:322
+msgid "Close workspace:"
+msgstr "ワークスペースを閉じる:"
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Command"
+msgstr "コマンド"
+
+#: ../widget/remote_server_dialog.vala:295 ../widget/command_dialog.vala:172
+msgid "Command:"
+msgstr "コマンド:"
+
+#: ../widget/command_dialog.vala:83
+msgid "Content"
+msgstr ""
+
+#: ../widget/terminal.vala:347 ../widget/config_window.vala:304
+#: ../widget/entry_menu.vala:39
+msgid "Copy"
+msgstr "コピー"
+
+#: ../widget/terminal.vala:352
+msgid "Copy link"
+msgstr "リンクをコピー"
+
+#: ../widget/preference.vala:375
+msgid "Copy on select"
+msgstr ""
+
+#: ../widget/preference.vala:304
+msgid "Copy:"
+msgstr "コピー:"
+
+#: ../widget/preference_slidebar.vala:84 ../widget/preference.vala:349
+msgid "Cursor"
+msgstr "カーソル"
+
+#: ../widget/preference.vala:374
+msgid "Cursor autohide"
+msgstr "カーソルを自動的に隠す"
+
+#: ../widget/preference.vala:373
+msgid "Cursor blink"
+msgstr "カーソル点滅"
+
+#: ../widget/preference.vala:200
+msgid "Cursor style:"
+msgstr "カーソルスタイル:"
+
+#: ../widget/terminal.vala:448 ../widget/config_window.vala:360
+#: ../widget/appbar.vala:122
+msgid "Custom commands"
+msgstr "カスタムコマンド"
+
+#: ../widget/preference.vala:343
+msgid "Custom commands:"
+msgstr "カスタムコマンド:"
+
+#: ../widget/entry_menu.vala:38
+msgid "Cut"
+msgstr "切り取り"
+
+#: ../main.vala:189
+msgid ""
+"Deepin Teminal is an advanced terminal emulator with window-splitting, "
+"workspaces, remote management, Quake mode and other features."
+msgstr ""
+
+#: ../main.vala:188 ../widget/about_widget.vala:101 ../widget/tabbar.vala:610
+msgid "Deepin Terminal"
+msgstr "Deepin Terminal"
+
+#: ../widget/about_widget.vala:49
+msgid ""
+"Deepin Terminal is an advanced terminal emulator with workspace, multiple windows, remote management, quake mode and other features.\n"
+"\n"
+"It sharpens your focus in the world of command line!"
+msgstr ""
+
+#: ../widget/config_window.vala:310
+msgid "Default size"
+msgstr ""
+
+#: ../widget/preference.vala:310
+msgid "Default size:"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:428 ../widget/command_dialog.vala:251
+#: ../widget/entry_menu.vala:44
+msgid "Delete"
+msgstr "削除"
+
+#: ../widget/command_dialog.vala:238 ../widget/command_dialog.vala:248
+msgid "Delete command"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Delete key"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:334
+msgid "Delete key:"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:415
+#: ../widget/remote_server_dialog.vala:425
+msgid "Delete server"
+msgstr ""
+
+#: ../widget/config_window.vala:359
+msgid "Display shortcuts"
+msgstr ""
+
+#: ../widget/preference.vala:342
+msgid "Display shortcuts:"
+msgstr ""
+
+#: ../main.vala:128
+msgid "Display version"
+msgstr ""
+
+#: ../widget/terminal.vala:453
+msgid "Download file"
+msgstr ""
+
+#: ../widget/command_dialog.vala:124
+msgid "Edit Command"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:152
+msgid "Edit Server"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:107 ../widget/terminal.vala:447
+msgid "Encoding"
+msgstr "エンコーディング"
+
+#: ../widget/remote_server_dialog.vala:308
+msgid "Encoding:"
+msgstr "エンコーディング:"
+
+#: ../widget/confirm_dialog.vala:130 ../widget/appbar.vala:130
+msgid "Exit"
+msgstr "終了"
+
+#: ../widget/terminal.vala:397
+msgid "Exit fullscreen"
+msgstr "フルスクリーンを解除"
+
+#: ../widget/terminal.vala:403
+msgid "Find"
+msgstr "検索"
+
+#: ../widget/preference.vala:293
+msgid "Font size:"
+msgstr "フォントサイズ:"
+
+#: ../widget/preference.vala:292
+msgid "Font:"
+msgstr "フォント"
+
+#: ../widget/preference.vala:399 ../widget/terminal.vala:399
+msgid "Fullscreen"
+msgstr "フルスクリーンにする"
+
+#: ../widget/preference.vala:340
+msgid "Fullscreen:"
+msgstr "フルスクリーン:"
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Group"
+msgstr "グループ"
+
+#: ../widget/remote_server_dialog.vala:277
+msgid "Group:"
+msgstr "グループ:"
+
+#: ../widget/appbar.vala:127
+msgid "Help"
+msgstr "ヘルプ"
+
+#: ../widget/preference.vala:403
+msgid "Hide Quake window after losing focus"
+msgstr ""
+
+#: ../widget/terminal.vala:383 ../widget/config_window.vala:337
+msgid "Horizontal split"
+msgstr ""
+
+#: ../widget/preference.vala:326
+msgid "Horizontal split:"
+msgstr ""
+
+#: ../widget/preference_slidebar.vala:58 ../widget/preference.vala:252
+msgid "Interface"
+msgstr "インターフェイス"
+
+#: ../widget/config_window.vala:312
+msgid "Jump to next command"
+msgstr ""
+
+#: ../widget/preference.vala:311
+msgid "Jump to next command:"
+msgstr ""
+
+#: ../widget/config_window.vala:313
+msgid "Jump to previous command"
+msgstr ""
+
+#: ../widget/preference.vala:312
+msgid "Jump to previous command:"
+msgstr ""
+
+#: ../main.vala:182
+msgid "Load theme"
+msgstr ""
+
+#: ../widget/preference.vala:398
+msgid "Maximize"
+msgstr "最大化"
+
+#: ../widget/command_dialog.vala:83
+msgid "Name"
+msgstr "名前"
+
+#: ../widget/command_dialog.vala:159
+msgid "Name:"
+msgstr ""
+
+#: ../widget/appbar.vala:120
+msgid "New window"
+msgstr "新しいウインドウ"
+
+#: ../widget/terminal.vala:391 ../widget/config_window.vala:330
+msgid "New workspace"
+msgstr "新しいワークスペース"
+
+#: ../widget/preference.vala:321
+msgid "New workspace:"
+msgstr "新しいワークスペース:"
+
+#: ../widget/config_window.vala:332
+msgid "Next workspace"
+msgstr "次のワークスペース"
+
+#: ../widget/preference.vala:324
+msgid "Next workspace:"
+msgstr ""
+
+#: ../widget/preference.vala:397
+msgid "Normal window"
+msgstr ""
+
+#: ../widget/preference.vala:137
+msgid "Opacity:"
+msgstr "透明度:"
+
+#: ../widget/terminal.vala:365 ../widget/config_window.vala:306
+msgid "Open"
+msgstr "開く"
+
+#: ../widget/terminal.vala:373
+msgid "Open in file manager"
+msgstr "ファイルマネージャーを開く"
+
+#: ../widget/terminal.vala:351
+msgid "Open link"
+msgstr ""
+
+#: ../widget/config_window.vala:335
+msgid "Open terminal with a new theme"
+msgstr "新しいテーマでターミナルを開く"
+
+#: ../widget/preference.vala:306
+msgid "Open:"
+msgstr "開く:"
+
+#: ../widget/remote_server_dialog.vala:275
+#: ../widget/remote_server_dialog.vala:285
+#: ../widget/remote_server_dialog.vala:294
+msgid "Optional"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Password"
+msgstr "パスワード"
+
+#: ../widget/remote_server_dialog.vala:247
+msgid "Password:"
+msgstr "パスワード:"
+
+#: ../widget/terminal.vala:358 ../widget/config_window.vala:305
+#: ../widget/entry_menu.vala:41
+msgid "Paste"
+msgstr "貼り付け"
+
+#: ../widget/preference.vala:305
+msgid "Paste:"
+msgstr "貼り付け:"
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Path"
+msgstr "パス"
+
+#: ../widget/remote_server_dialog.vala:286
+msgid "Path:"
+msgstr "パス:"
+
+#: ../widget/shortcut_entry.vala:147
+msgid "Please enter a new shortcut"
+msgstr "新しいショートカットを入力してください"
+
+#: ../widget/remote_server_dialog.vala:199
+msgid "Port:"
+msgstr "ポート:"
+
+#: ../widget/config_window.vala:333
+msgid "Previous workspace"
+msgstr "前のワークスペース"
+
+#: ../widget/preference.vala:323
+msgid "Previous workspace:"
+msgstr ""
+
+#: ../widget/confirm_dialog.vala:130
+msgid "Programs are still running in terminal"
+msgstr ""
+
+#: ../main.vala:173
+msgid "Quake mode"
+msgstr ""
+
+#: ../widget/terminal.vala:449 ../widget/config_window.vala:361
+#: ../widget/appbar.vala:123
+msgid "Remote management"
+msgstr ""
+
+#: ../widget/preference.vala:344
+msgid "Remote management:"
+msgstr ""
+
+#: ../widget/terminal.vala:653
+msgid "Rename"
+msgstr "名前の変更"
+
+#: ../widget/terminal.vala:446 ../widget/terminal.vala:650
+#: ../widget/config_window.vala:357
+msgid "Rename title"
+msgstr ""
+
+#: ../widget/preference.vala:341
+msgid "Rename title:"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:186
+#: ../widget/remote_server_dialog.vala:196
+#: ../widget/remote_server_dialog.vala:232 ../widget/command_dialog.vala:158
+#: ../widget/command_dialog.vala:171
+msgid "Required"
+msgstr "必須"
+
+#: ../widget/preference.vala:416
+msgid "Restore Defaults"
+msgstr ""
+
+#: ../main.vala:155 ../main.vala:164
+msgid "Run a program in the terminal"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:350 ../widget/command_dialog.vala:195
+msgid "Save"
+msgstr "保存"
+
+#: ../widget/preference_slidebar.vala:87 ../widget/preference.vala:377
+msgid "Scroll"
+msgstr "スクロール"
+
+#: ../widget/preference.vala:383
+msgid "Scroll on keystroke"
+msgstr ""
+
+#: ../widget/preference.vala:384
+msgid "Scroll on output"
+msgstr ""
+
+#: ../widget/terminal.vala:406 ../widget/search_entry.vala:64
+#: ../widget/search_entry.vala:66 ../widget/config_window.vala:307
+msgid "Search"
+msgstr "検索"
+
+#: ../widget/preference.vala:307 ../widget/remote_panel.vala:357
+#: ../widget/command_panel.vala:201
+msgid "Search:"
+msgstr "検索:"
+
+#: ../widget/terminal.vala:619 ../widget/file_button.vala:71
+msgid "Select"
+msgstr "選択"
+
+#: ../widget/config_window.vala:311 ../widget/entry_menu.vala:47
+msgid "Select all"
+msgstr "全選択"
+
+#: ../widget/preference.vala:313
+msgid "Select all:"
+msgstr "全選択:"
+
+#: ../widget/terminal.vala:617
+msgid "Select directory to save the file"
+msgstr ""
+
+#: ../widget/terminal.vala:588
+msgid "Select file to upload"
+msgstr ""
+
+#: ../widget/config_window.vala:340
+msgid "Select left window"
+msgstr ""
+
+#: ../widget/preference.vala:329
+msgid "Select left window:"
+msgstr ""
+
+#: ../widget/config_window.vala:339
+msgid "Select lower window"
+msgstr ""
+
+#: ../widget/preference.vala:328
+msgid "Select lower window:"
+msgstr ""
+
+#: ../widget/config_window.vala:341
+msgid "Select right window"
+msgstr ""
+
+#: ../widget/preference.vala:330
+msgid "Select right window:"
+msgstr ""
+
+#: ../widget/file_button.vala:67
+msgid "Select the private key file"
+msgstr ""
+
+#: ../widget/config_window.vala:338
+msgid "Select upper window"
+msgstr ""
+
+#: ../widget/preference.vala:327
+msgid "Select upper window:"
+msgstr ""
+
+#: ../widget/config_window.vala:334
+msgid "Select workspace"
+msgstr "ワークスペースを選択"
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Server name"
+msgstr "サーバー名"
+
+#: ../widget/remote_server_dialog.vala:187
+msgid "Server name:"
+msgstr "サーバー名:"
+
+#: ../main.vala:137
+msgid "Set the terminal startup directory"
+msgstr ""
+
+#: ../main.vala:119
+msgid "Set the terminal window mode"
+msgstr ""
+
+#: ../widget/terminal.vala:457 ../widget/appbar.vala:125
+msgid "Settings"
+msgstr "設定"
+
+#: ../widget/preference_slidebar.vala:65 ../widget/preference.vala:295
+#: ../widget/command_dialog.vala:83
+msgid "Shortcuts"
+msgstr "ショートカット"
+
+#: ../widget/command_dialog.vala:180
+msgid "Shortcuts:"
+msgstr "ショートカット:"
+
+#: ../widget/terminal.vala:444 ../widget/appbar.vala:121
+msgid "Switch theme"
+msgstr "テーマ切り替え"
+
+#: ../widget/preference_slidebar.vala:68 ../widget/preference.vala:298
+#: ../widget/config_window.vala:318
+msgid "Terminal"
+msgstr "ターミナル"
+
+#: ../widget/config_window.vala:358
+msgid "Toggle fullscreen"
+msgstr ""
+
+#: ../widget/terminal.vala:631
+msgid "Type path to download file"
+msgstr ""
+
+#: ../widget/terminal.vala:592
+msgid "Upload"
+msgstr "アップロード"
+
+#: ../widget/terminal.vala:452
+msgid "Upload file"
+msgstr "ファイルをアップロード"
+
+#: ../widget/preference.vala:400
+msgid "Use on starting:"
+msgstr ""
+
+#: ../widget/remote_server_dialog.vala:107
+msgid "Username"
+msgstr "ユーザー名"
+
+#: ../widget/remote_server_dialog.vala:233
+msgid "Username:"
+msgstr "ユーザー名:"
+
+#: ../widget/about_widget.vala:105
+msgid "Version:"
+msgstr "バージョン"
+
+#: ../widget/terminal.vala:384 ../widget/config_window.vala:336
+msgid "Vertical split"
+msgstr ""
+
+#: ../widget/preference.vala:325
+msgid "Vertical split:"
+msgstr ""
+
+#: ../widget/terminal.vala:1519
+msgid ""
+"Welcome to Deepin Terminal, please make sure that rz and sz commands have "
+"been installed in the server before right clicking to upload and download "
+"files."
+msgstr ""
+
+#: ../widget/preference_slidebar.vala:90 ../widget/preference.vala:386
+msgid "Window"
+msgstr "ウインドウ"
+
+#: ../widget/preference_slidebar.vala:71 ../widget/preference.vala:315
+#: ../widget/config_window.vala:348
+msgid "Workspace"
+msgstr "ワークスペース"
+
+#: ../widget/config_window.vala:308
+msgid "Zoom in"
+msgstr "縮小"
+
+#: ../widget/preference.vala:308
+msgid "Zoom in:"
+msgstr ""
+
+#: ../widget/config_window.vala:309
+msgid "Zoom out"
+msgstr "拡大"
+
+#: ../widget/preference.vala:309
+msgid "Zoom out:"
+msgstr ""
+
+#: ../widget/terminal.vala:792 ../widget/terminal.vala:1240
+msgid "deepin"
+msgstr ""
