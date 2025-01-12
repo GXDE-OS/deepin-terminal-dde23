@@ -9,10 +9,17 @@
 #include "iconbutton.h"
 
 // dtk
+#include <DPaletteHelper>
 
 // qt
 #include <QDebug>
 #include <QApplication>
+
+// 不同布局模式配置
+const int s_ItemHeight = 60;
+const QMargins s_ItemIconContentMargins = {8, 8, 8, 8};
+const int s_ItemHeightCompact = 52;
+const QMargins s_ItemIconContentMarginsCompact = {4, 4, 4, 4};
 
 // 需要选择Item类型
 ItemWidget::ItemWidget(ItemFuncType itemType, QWidget *parent)
@@ -83,6 +90,9 @@ void ItemWidget::setFuncIcon(ItemFuncType iconType)
     case ItemFuncType_UngroupedItem:
         m_funcButton->hide();
         m_deleteButton->hide();
+        break;
+    default:
+        break;
     }
 
 }
@@ -105,7 +115,7 @@ void ItemWidget::setText(const QString &firstline, const QString &secondline)
         // 输入的第二行信息
         m_secondText = secondline;
         break;
-    case ItemFuncType_Group:
+    case ItemFuncType_Group:{
         // 第二行 组内服务器个数
         int serverCount = ServerConfigManager::instance()->getServerCount(firstline);
         if (serverCount <= 0) {
@@ -113,6 +123,9 @@ void ItemWidget::setText(const QString &firstline, const QString &secondline)
             serverCount = 0;
         }
         m_secondText = QString("%1 server").arg(serverCount);
+        break;
+    }
+    default:
         break;
     }
     // 设置第二行信息
@@ -243,6 +256,8 @@ void ItemWidget::onIconButtonClicked()
         qInfo() << "item clicked" << m_firstText;
         emit itemClicked(m_firstText);
         break;
+    default:
+        break;
     }
 }
 
@@ -269,6 +284,27 @@ void ItemWidget::onFocusOut(Qt::FocusReason type)
                 m_deleteButton->hide();
         }
     }
+}
+
+/**
+ * @brief 根据布局模式(紧凑)变更更新界面布局，ItemWidget 不绑定变更信号，
+ *      而是通过外部 ListView 处理。
+ */
+void ItemWidget::updateSizeMode()
+{
+#ifdef DTKWIDGET_CLASS_DSizeMode
+    if (DGuiApplicationHelper::isCompactMode()) {
+        m_iconLayout->setContentsMargins(s_ItemIconContentMarginsCompact);
+        setFixedSize(220, s_ItemHeightCompact);
+        setFont(m_firstline, DFontSizeManager::T6, ItemTextColor_Text);
+        setFont(m_secondline, DFontSizeManager::T7, ItemTextColor_TextTips);
+    } else {
+        m_iconLayout->setContentsMargins(s_ItemIconContentMargins);
+        setFixedSize(220, s_ItemHeight);
+        setFont(m_firstline, DFontSizeManager::T7, ItemTextColor_Text);
+        setFont(m_secondline, DFontSizeManager::T8, ItemTextColor_TextTips);
+    }
+#endif
 }
 
 void ItemWidget::initUI()
@@ -357,12 +393,15 @@ void ItemWidget::initUI()
     }
     m_mainLayout->addStretch();
     setLayout(m_mainLayout);
+
+    // 根据不同布局初始化界面
+    updateSizeMode();
 }
 
 void ItemWidget::initConnections()
 {
     // 颜色随主题变化
-    connect(DApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &ItemWidget::slotThemeChange);
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &ItemWidget::slotThemeChange);
     // 删除键被点击
     connect(m_deleteButton, &DIconButton::clicked, this, [this] {
         emit itemDelete(m_firstText, m_functType);
@@ -375,7 +414,6 @@ void ItemWidget::initConnections()
     connect(m_funcButton, &IconButton::focusOut, this, &ItemWidget::onFocusOut);
     // 图标被点击
     connect(m_iconButton, &DIconButton::clicked, this, &ItemWidget::onIconButtonClicked);
-
 }
 
 void ItemWidget::paintEvent(QPaintEvent *event)
@@ -384,8 +422,15 @@ void ItemWidget::paintEvent(QPaintEvent *event)
     QFont firstFont = m_firstline->font();
     QFont secondFont = m_secondline->font();
     // 限制文字长度,防止超出
-    QString firstText = Utils::getElidedText(firstFont, m_firstText, ITEMMAXWIDTH);
-    QString secondText = Utils::getElidedText(secondFont, m_secondText, ITEMMAXWIDTH);
+    QString firstText;
+    QString secondText;
+    if (!m_funcButton->isVisible()) {
+        firstText = Utils::getElidedText(firstFont, m_firstText, ITEMMAXWIDTH);
+        secondText = Utils::getElidedText(secondFont, m_secondText, ITEMMAXWIDTH);
+    } else {
+        firstText = Utils::getElidedText(firstFont, m_firstText, ITEMMAXWIDTH - m_funcButton->width());
+        secondText = Utils::getElidedText(secondFont, m_secondText, ITEMMAXWIDTH - m_funcButton->width());
+    }
     // 设置显示的文字
     m_firstline->setText(firstText);
     m_secondline->setText(secondText);
@@ -529,7 +574,7 @@ void ItemWidget::setFontSize(DLabel *label, DFontSizeManager::SizeType fontSize)
 
 void ItemWidget::setFontColor(DLabel *label, ItemTextColor colorType)
 {
-    DPalette fontPalette = DApplicationHelper::instance()->palette(label);
+    DPalette fontPalette = DPaletteHelper::instance()->palette(label);
     QColor color = getColor(colorType);
     if (color.isValid()) {
         fontPalette.setBrush(DPalette::Text, color);
@@ -605,6 +650,8 @@ void ItemWidget::onItemClicked()
         break;
     case ItemFuncType_UngroupedItem:
         m_checkBox->setChecked(!m_checkBox->isChecked());
+        break;
+    default:
         break;
     }
 }

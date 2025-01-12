@@ -12,9 +12,9 @@
 #include <DFontSizeManager>
 #include <DPushButton>
 #include <DSuggestButton>
-#include <DVerticalLine>
 #include <DApplicationHelper>
 #include <DGuiApplicationHelper>
+#include <DPaletteHelper>
 #include <DFileDialog>
 #include <DPalette>
 #include <DDialog>
@@ -100,7 +100,7 @@ void ServerConfigOptDlg::initUI()
     // 字色
     DPalette palette = m_titleLabel->palette();
     QColor color;
-    if (DApplicationHelper::DarkType == DApplicationHelper::instance()->themeType())
+    if (DGuiApplicationHelper::DarkType == DGuiApplicationHelper::instance()->themeType())
         color = QColor::fromRgb(192, 198, 212, 255);
     else
         color = QColor::fromRgb(0, 26, 46, 255);
@@ -230,17 +230,17 @@ void ServerConfigOptDlg::initUI()
     }
     Utils::setSpaceInWord(pCancelButton);
     Utils::setSpaceInWord(pAddSaveButton);
-    DPalette pa = DApplicationHelper::instance()->palette(pAddSaveButton);
+    DPalette pa = DPaletteHelper::instance()->palette(pAddSaveButton);
     QBrush brush = pa.textLively().color();
     pa.setBrush(DPalette::ButtonText, brush);
     pAddSaveButton->setPalette(pa);
     QHBoxLayout *pBtHbLayout = new QHBoxLayout();
-    DVerticalLine *line = new DVerticalLine();
-    line->setFixedSize(3, 28);
+    m_bottomVLine = new DVerticalLine();
+    m_bottomVLine->setFixedSize(3, 28);
     pBtHbLayout->setContentsMargins(10, 0, 10, 0);
     pBtHbLayout->setSpacing(9);
     pBtHbLayout->addWidget(pCancelButton);
-    pBtHbLayout->addWidget(line);
+    pBtHbLayout->addWidget(m_bottomVLine);
     pBtHbLayout->addWidget(pAddSaveButton);
     m_VBoxLayout->addLayout(pBtHbLayout);
     setLayout(m_VBoxLayout);
@@ -250,10 +250,21 @@ void ServerConfigOptDlg::initUI()
     });
     connect(pAddSaveButton, &DPushButton::clicked, this, &ServerConfigOptDlg::slotAddSaveButtonClicked);
     // 字体颜色随主题变化变化
-    connect(DApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &ServerConfigOptDlg::handleThemeTypeChanged);
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &ServerConfigOptDlg::handleThemeTypeChanged);
 
     // 设置焦点顺序
     setTabOrder(pAddSaveButton, m_closeButton);
+
+#ifdef DTKWIDGET_CLASS_DSizeMode
+    updateSizeMode();
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::sizeModeChanged, this, &ServerConfigOptDlg::updateSizeMode);
+    // 仅在紧凑模式下处理，此模式下调整字体大小可能导致布局间距存在差异。
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::fontChanged, this, [this](){
+        if (DGuiApplicationHelper::isCompactMode()) {
+            QTimer::singleShot(0, this, [=](){ resize(SETTING_DIALOG_WIDTH, sizeHint().height()); });
+        }
+    });
+#endif
 }
 
 inline void ServerConfigOptDlg::handleThemeTypeChanged(DGuiApplicationHelper::ColorType themeType)
@@ -261,13 +272,48 @@ inline void ServerConfigOptDlg::handleThemeTypeChanged(DGuiApplicationHelper::Co
     DPalette palette = m_titleLabel->palette();
     //palette.setBrush(QPalette::WindowText, palette.color(DPalette::TextTitle));
     QColor color;
-    if (DApplicationHelper::DarkType == themeType)
+    if (DGuiApplicationHelper::DarkType == themeType)
         color = QColor::fromRgb(192, 198, 212, 255);
     else
         color = QColor::fromRgb(0, 26, 46, 255);
 
     palette.setBrush(QPalette::WindowText, color);
     m_titleLabel->setPalette(palette);
+}
+
+/**
+ * @brief 接收 DGuiApplicationHelper::sizeModeChanged() 信号, 根据不同的布局模式调整
+ *      当前界面的布局. 只能在界面创建完成后调用.
+ *      在此界面中调整标题栏组件、文本Label的属性，调整后修改设置框界面大小。
+ */
+void ServerConfigOptDlg::updateSizeMode()
+{
+#ifdef DTKWIDGET_CLASS_DSizeMode
+    QList<DLabel *> labelList = findChildren<DLabel *>();
+
+    if (DGuiApplicationHelper::isCompactMode()) {
+        for (DLabel *label : labelList) {
+            label->setFixedHeight(COMMONHEIGHT_COMPACT);
+        }
+
+        m_iconLabel->setFixedSize(ICONSIZE_40_COMPACT, ICONSIZE_40_COMPACT);
+        m_closeButton->setFixedWidth(ICONSIZE_40_COMPACT);
+        m_closeButton->setIconSize(QSize(ICONSIZE_40_COMPACT, ICONSIZE_40_COMPACT));
+        m_bottomVLine->setFixedSize(VERTICAL_WIDTH_COMPACT, VERTICAL_HEIGHT_COMPACT);
+    } else {
+        for (DLabel *label : labelList) {
+            label->setMinimumHeight(COMMONHEIGHT);
+        }
+
+        m_iconLabel->setFixedSize(ICONSIZE_50, ICONSIZE_50);
+        m_closeButton->setFixedWidth(ICONSIZE_50);
+        m_closeButton->setIconSize(QSize(ICONSIZE_50, ICONSIZE_50));
+        m_bottomVLine->setFixedSize(VERTICAL_WIDTH, VERTICAL_HEIGHT);
+    }
+
+    // 根据新界面布局，刷新界面大小
+    QTimer::singleShot(0, this, [=](){ resize(SETTING_DIALOG_WIDTH, sizeHint().height()); });
+#endif
 }
 
 void ServerConfigOptDlg::initData()

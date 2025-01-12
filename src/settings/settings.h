@@ -67,6 +67,11 @@ public:
      */
     bool cursorBlink() const;
     /**
+     * @brief enableSetCursorPosition
+     * @return
+     */
+    bool enableSetCursorPosition() const;
+    /**
      * @brief 设置界面获取背景模糊属性
      * @author ut001121 zhangmeng
      * @return
@@ -208,6 +213,11 @@ public:
      * @return
      */
     bool disableControlFlow(void);
+    // 是否启用debuginfod：设置或取消DEBUGINFOD_URLS环境变量
+    bool enableDebuginfod();
+    // deepin-terminal设置的DEBUGINFOD_URLS环境变量值
+    QString debuginfodUrls();
+
     /**
      * @brief 历史记录行数
      * @author Archie Meng
@@ -296,6 +306,7 @@ signals:
     void opacityChanged(qreal opacity);
     void cursorShapeChanged(int shape);
     void cursorBlinkChanged(bool blink);
+    void enableSetCursorPosition(bool enable);
     void backgroundBlurChanged(bool enabled);
     void pressingScrollChanged(bool enabled);
     void OutputScrollChanged(bool enabled);

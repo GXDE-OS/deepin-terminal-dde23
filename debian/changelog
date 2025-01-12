@@ -1,3 +1,39 @@
+deepin-terminal (6.0.17) unstable; urgency=medium
+
+  * fix: crash on treeland (#378)
+
+ -- Yutao Meng <mengyutao@deepin.org>  Sat, 07 Dec 2024 13:48:11 +0800
+
+deepin-terminal (6.0.16) unstable; urgency=medium
+
+  * feat: Add debuginfod settings (#366)
+
+ -- Yutao Meng <mengyutao@deepin.org>  Tue, 19 Nov 2024 10:05:41 +0800
+
+deepin-terminal (6.0.15) unstable; urgency=medium
+
+  * Release 6.0.15
+  * feat: [UI] Adapt compact mode.(https://pms.uniontech.com/bug-view-279709.html)
+
+ -- Zhang Kun <zhangkun2@uniontech.com>  Fri, 25 Oct 2024 18:09:30 +0800
+
+deepin-terminal (6.0.14) unstable; urgency=medium
+
+  * chore: Update translation (#346)
+
+ -- Zhang Kun <zhangkun2@uniontech.com>  Thu, 01 Aug 2024 09:31:00 +0800
+
+deepin-terminal (6.0.13) unstable; urgency=medium
+
+  * fix: Remote server item text overlaps with buttons
+    新增Ctrl + 鼠标点击移动光标功能
+    为Ctrl+鼠标左键点击移动光标功能新增配置
+    fix: item is hidden partially in settingsdialog
+    fix: Bug# 点击自定义主题后未确认，菜单勾选状态错误
+    更新退出终端的警告弹窗提示语
+
+ -- Yutao Meng <mengyutao@deepin.org>  Fri, 21 Jun 2024 13:41:33 +0800
+
 deepin-terminal (6.0.12) unstable; urgency=medium
 
   * fix: the quake window overlaps with the dock (Issue: #6557)

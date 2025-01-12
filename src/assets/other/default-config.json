@@ -335,6 +335,12 @@
                             "type": "checkbox",
                             "text": "Copy on select",
                             "default": true
+                        },
+			    {
+                            "key": "set_cursor_position",
+                            "type": "checkbox",
+                            "text": "Allow Ctrl + left mouse click to set cursor position",
+                            "default": false
                         }
                     ]
                 },
@@ -413,6 +419,24 @@
                             "text": "Disable flow control using Ctrl+S, Ctrl+Q",
                             "type": "checkbox",
                             "default": "false"
+                        }
+                    ]
+                },
+                {
+                    "key": "debuginfod",
+                    "name": "Debuginfod",
+                    "options": [
+                        {
+                            "key": "enable_debuginfod",
+                            "text": "The HTTP file server used for transmitting debugging information resources",
+                            "type": "checkbox",
+                            "default": "true"
+                        },
+                        {
+                            "key": "debuginfod_urls",
+                            "name": "debuginfod URLs",
+                            "type": "lineedit",
+                            "default": "https://debuginfod.deepin.com"
                         }
                     ]
                 }

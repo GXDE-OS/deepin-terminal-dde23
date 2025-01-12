@@ -458,10 +458,10 @@ bool MainWindow::hasRunningProcesses()
         //没有校验当前tab中是否有其它正在执行的分屏
         if (tabPage->runningTerminalCount() != 0) {
             /******** Modify by nt001000 renfeixiang 2020-05-28:修改 判断当前tab中是否有其它分屏正在执行 End***************/
-            qInfo() << "here are processes running in this terminal tab... " << tabPage->identifier() << endl;
+            qInfo() << "here are processes running in this terminal tab... " << tabPage->identifier();
             return true;
         } else {
-            qInfo() << "no processes running in this terminal tab... " << tabPage->identifier() << endl;
+            qInfo() << "no processes running in this terminal tab... " << tabPage->identifier();
         }
     }
 
@@ -860,7 +860,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if ((!m_hasConfirmedClose) && (runningCount != 0)) {
         // 如果不能马上关闭，并且还在没有最小化．
         if ((runningCount != 0)  && isMinimized()) {
-            qInfo() << "isMinimized........... " << endl;
+            qInfo() << "isMinimized........... ";
             setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
         }
 
@@ -929,8 +929,14 @@ QString MainWindow::getConfigWindowState()
 
 QSize MainWindow::halfScreenSize()
 {
-    int w = qApp->desktop()->availableGeometry().width();
-    int h = qApp->desktop()->availableGeometry().height();
+    QScreen *screen = QGuiApplication::screenAt(QCursor::pos());
+    if (!screen) {
+        qCritical() << "Can't get the screen where the cursor is located!";
+        return QSize(0 ,0);
+    }
+
+    int w = screen->availableGeometry().width();
+    int h = screen->availableGeometry().height();
 
     QSize size;
     //开启窗管特效时会有1px的border
@@ -1069,11 +1075,11 @@ inline void MainWindow::slotShortcutSwitchActivated()
         }
 
         if (i - 1 >= m_tabbar->count()) {
-            qInfo() << "i - 1 > tabcount" << i - 1 << m_tabbar->count() << endl;
+            qInfo() << "i - 1 > tabcount" << i - 1 << m_tabbar->count();
             return;
         }
 
-        qInfo() << "index" << i - 1 << endl;
+        qInfo() << "index" << i - 1;
         m_tabbar->setCurrentIndex(i - 1);
         return;
     }
@@ -1130,15 +1136,9 @@ inline void MainWindow::slotShortcutHorizonzalSplit()
     // 判读数量是否允许分屏
     if (Service::instance()->isCountEnable()) {
         TermWidgetPage *page = currentPage();
-        if (page) {
-            if (page->currentTerminal()) {
-                int layer = page->currentTerminal()->getTermLayer();
-                DSplitter *splitter = qobject_cast<DSplitter *>(page->currentTerminal()->parentWidget());
-                if (1 == layer  || (2 == layer  &&  splitter && Qt::Horizontal == splitter->orientation())) {
-                    page->split(Qt::Horizontal);
-                    return ;
-                }
-            }
+        if (page && page->currentTerminal()->canSplit(Qt::Vertical)) {
+            page->split(Qt::Horizontal);
+            return ;
         }
     }
     qInfo() << "can't split vertical  again";
@@ -1149,15 +1149,9 @@ inline void MainWindow::slotShortcutVerticalSplit()
     // 判读数量是否允许分屏
     if (Service::instance()->isCountEnable()) {
         TermWidgetPage *page = currentPage();
-        if (page) {
-            if (page->currentTerminal()) {
-                int layer = page->currentTerminal()->getTermLayer();
-                DSplitter *splitter = qobject_cast<DSplitter *>(page->currentTerminal()->parentWidget());
-                if (1 == layer  || (2 == layer  &&  splitter && Qt::Vertical == splitter->orientation())) {
-                    page->split(Qt::Vertical);
-                    return ;
-                }
-            }
+        if (page && page->currentTerminal()->canSplit(Qt::Horizontal)) {
+            page->split(Qt::Vertical);
+            return ;
         }
     }
     qInfo() << "can't split vertical  again";
@@ -2078,6 +2072,7 @@ void MainWindow::addThemeMenuItems()
 
         connect(switchThemeMenu, SIGNAL(mainWindowCheckThemeItemSignal()), this, SLOT(themeRecovery()));
         connect(switchThemeMenu, SIGNAL(menuHideSetThemeSignal()), this, SLOT(themeRecovery()));
+        connect(switchThemeMenu, &SwitchThemeMenu::aboutToShow, this, &MainWindow::checkThemeItem);
     }
 }
 
@@ -2417,16 +2412,9 @@ void QuakeWindow::initTitleBar()
 
 void QuakeWindow::slotWorkAreaResized()
 {
-    qInfo() << "workAreaResized" << QApplication::desktop()->availableGeometry();
-    /******** Modify by nt001000 renfeixiang 2020-05-20:修改成只需要设置雷神窗口宽度,根据字体高度设置雷神最小高度 Begin***************/
-    setMinimumWidth(QApplication::desktop()->availableGeometry().width());
+    resizeByCurrentScreen(true);
     setWindowMinHeightForFont();
-    /******** Add by ut001000 renfeixiang 2020-08-07:workAreaResized时改变大小，bug#41436***************/
     updateMinHeight();
-    /******** Modify by nt001000 renfeixiang 2020-05-20:修改成只需要设置雷神窗口宽度,根据字体高度设置雷神最小高度 End***************/
-    move(QApplication::desktop()->availableGeometry().x(), QApplication::desktop()->availableGeometry().y());
-    qInfo() << "size" << size();
-    setFixedWidth(QApplication::desktop()->availableGeometry().width());
     return ;
 }
 
@@ -2434,9 +2422,7 @@ void QuakeWindow::initWindowAttribute()
 {
     /************************ Add by m000743 sunchengxi 2020-04-27:雷神窗口任务栏移动后位置异常问题 Begin************************/
     setWindowRadius(0);
-    //QRect deskRect = QApplication::desktop()->availableGeometry();//获取可用桌面大小
-    QDesktopWidget *desktopWidget = QApplication::desktop();
-    QRect screenRect = desktopWidget->screenGeometry(); //获取设备屏幕大小
+
     Qt::WindowFlags windowFlags = this->windowFlags();
     setWindowFlags(windowFlags | Qt::WindowStaysOnTopHint/* | Qt::FramelessWindowHint | Qt::BypassWindowManagerHint*/ /*| Qt::Dialog*/);
     //wayland时需要隐藏WindowTitle
@@ -2447,31 +2433,11 @@ void QuakeWindow::initWindowAttribute()
     //add a line by ut001121 zhangmeng 2020-04-27雷神窗口禁用移动(修复bug#22975)
     setEnableSystemMove(false);//    setAttribute(Qt::WA_Disabled, true);
 
-    /******** Modify by m000714 daizhengwen 2020-03-26: 窗口高度超过２／３****************/
-    setMinimumSize(screenRect.size().width(), 60);
-    setMaximumHeight(screenRect.size().height() * 2 / 3);
     /********************* Modify by m000714 daizhengwen End ************************/
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    // 计算屏幕宽度，设置雷神终端宽度
-    QList<QScreen *> screenList = qApp->screens();
-    int w = screenList[0]->geometry().width();
-    for (auto it = screenList.constBegin(); it != screenList.constEnd(); ++it) {
-        QRect rect = (*it)->geometry();
-        if (rect.x() == 0 && rect.y() == 0) {
-            w = rect.width();
-            break;
-        }
-    }
-    setFixedWidth(w);
-    connect(desktopWidget, &QDesktopWidget::workAreaResized, this, &QuakeWindow::slotWorkAreaResized);
 
-    int saveHeight = getQuakeHeight();
-    int saveWidth = screenRect.size().width();
-    resize(QSize(saveWidth, saveHeight));
-    // 记录雷神高度
-    m_quakeWindowHeight = saveHeight;
-    move(QApplication::primaryScreen()->availableGeometry().x(), QApplication::primaryScreen()->availableGeometry().y());
-    /************************ Add by m000743 sunchengxi 2020-04-27:雷神窗口任务栏移动后位置异常问题 End  ************************/
+    resizeByCurrentScreen(true);
+    // FIXME(hualet): don't know why, just keep it for now.
+    getQuakeHeight();
 
     /******** Add by nt001000 renfeixiang 2020-05-20:增加setQuakeWindowMinHeight函数，设置雷神最小高度 Begin***************/
     setWindowMinHeightForFont();
@@ -2697,6 +2663,21 @@ void QuakeWindow::sendWindowForhibitMove(bool forhibit)
     int32_t ldata = forhibit;
     xcb_change_property(QX11Info::connection(), XCB_PROP_MODE_REPLACE, this->winId(),
                         reply, reply, 32, 1, &ldata);
+}
+
+void QuakeWindow::resizeByCurrentScreen(bool force)
+{
+    QPoint cursorPoint = QCursor::pos();
+    const QScreen *quakeScreen = QGuiApplication::screenAt(pos());
+    const QScreen *cursorScreen = QGuiApplication::screenAt(cursorPoint);
+    if (force || (!isVisible() && quakeScreen->serialNumber() != cursorScreen->serialNumber())) {
+        int windowWidth = cursorScreen->geometry().width();
+        move(cursorScreen->geometry().topLeft());
+        setFixedWidth(windowWidth);
+        setMinimumHeight(60);
+        setMaximumHeight(cursorScreen->geometry().height() * 2 / 3);
+        connect(cursorScreen, &QScreen::availableGeometryChanged, this, &QuakeWindow::slotWorkAreaResized);
+    }
 }
 
 void QuakeWindow::changeEvent(QEvent *event)

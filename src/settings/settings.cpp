@@ -252,7 +252,7 @@ void Settings::addShellOption()
     // 初始值
     keysList << DEFAULT_SHELL;
     // 数据转换
-    for (const QString key : shellsMap.keys())
+    for (const QString &key : shellsMap.keys())
         keysList << key;
     g_shellConfigCombox->addItems(keysList);
 }
@@ -288,7 +288,7 @@ void Settings::initConnection()
 {
     connect(settings, &Dtk::Core::DSettings::valueChanged, this, [ = ](const QString & key, const QVariant & value) {
         Q_UNUSED(value)
-        if (key.contains("basic.interface.") || key.contains("advanced.cursor.") || key.contains("advanced.scroll.") || key.contains("advanced.shell."))
+        if (key.contains("basic.interface.") || key.contains("advanced.cursor.") || key.contains("advanced.scroll.") || key.contains("advanced.shell.") || key.contains("advanced.debuginfod."))
             emit terminalSettingChanged(key);
         else if (key.contains("shortcuts."))
             emit shortcutSettingChanged(key);
@@ -314,6 +314,11 @@ void Settings::initConnection()
     QPointer<DSettingsOption> wordCharacters = settings->option("advanced.cursor.include_special_characters_in_double_click_selections");
     connect(wordCharacters, &Dtk::Core::DSettingsOption::valueChanged, this, [ = ](QVariant value) {
         emit wordCharactersChanged(value.toString());
+    });
+
+    QPointer<DSettingsOption> cursorPositionSet = settings->option("advanced.cursor.set_cursor_position");
+    connect(cursorPositionSet, &Dtk::Core::DSettingsOption::valueChanged, this, [ = ](QVariant value) {
+        emit enableSetCursorPosition(value.toBool());
     });
 
     QPointer<DSettingsOption> backgroundBlur = settings->option("basic.interface.blurred_background");
@@ -472,6 +477,11 @@ bool Settings::cursorBlink() const
     return settings->option("advanced.cursor.cursor_blink")->value().toBool();
 }
 
+bool Settings::enableSetCursorPosition() const
+{
+    return settings->option("advanced.cursor.set_cursor_position")->value().toBool();
+}
+
 bool Settings::backgroundBlur() const
 {
     return settings->option("basic.interface.blurred_background")->value().toBool();
@@ -596,6 +606,16 @@ void Settings::handleWidthFont()
 bool Settings::disableControlFlow(void)
 {
     return settings->option("advanced.shell.disable_ctrl_flow")->value().toBool();
+}
+
+bool Settings::enableDebuginfod()
+{
+    return settings->option("advanced.debuginfod.enable_debuginfod")->value().toBool();
+}
+
+QString Settings::debuginfodUrls()
+{
+    return settings->option("advanced.debuginfod.debuginfod_urls")->value().toString();
 }
 
 /******** Add by ut001000 renfeixiang 2020-06-15:增加 每次显示设置界面时，更新设置的等宽字体 End***************/

@@ -16,6 +16,7 @@
 #include <DDesktopServices>
 #include <DInputDialog>
 #include <DApplicationHelper>
+#include <DPaletteHelper>
 #include <DLog>
 #include <DDialog>
 #include <DFloatingMessage>
@@ -50,6 +51,15 @@ TermWidget::TermWidget(const TermProperties &properties, QWidget *parent) : QTer
     qInfo() << "Setting initial history size:" << Settings::instance()->historySize();
     setHistorySize(Settings::instance()->historySize());
     setTerminalWordCharacters(Settings::instance()->wordCharacters());
+
+    // 设置debuginfod
+    if (Settings::instance()->enableDebuginfod()) {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        if (!env.contains("DEBUGINFOD_URLS")) {
+            env.insert("DEBUGINFOD_URLS", Settings::instance()->debuginfodUrls());
+            setEnvironment(env.toStringList());
+        }
+    }
 
     QString strShellPath = Settings::instance()->shellPath();
     // set shell program
@@ -114,15 +124,13 @@ TermWidget::TermWidget(const TermProperties &properties, QWidget *parent) : QTer
     setKeyboardCursorShape(static_cast<QTermWidget::KeyboardCursorShape>(Settings::instance()->cursorShape()));
     // 光标闪烁
     setBlinkingCursor(Settings::instance()->cursorBlink());
+    // 是否允许移动光标
+    enableSetCursorPosition(Settings::instance()->enableSetCursorPosition());
 
     // 按键滚动
     setPressingScroll(Settings::instance()->PressingScroll());
 
-    /******** Modify by ut000439 wangpeili 2020-07-27: fix bug 39371: 分屏线可以拉到边****/
-    // 以最小mainwindow分4屏为标准的最小大小
-    /******** Modify by ut001000 renfeixiang 2020-08-07:修改成根据全局变量m_MinWidth，m_MinHeight计算出term的最小高度和宽度***************/
-    setMinimumSize(MainWindow::m_MinWidth / 2, (MainWindow::m_MinHeight - WIN_TITLE_BAR_HEIGHT) / 2);
-    /********************* Modify by n014361 wangpeili End ************************/
+    setMinimumSize(MIN_WIDTH, MIN_HEIGHT);
 
     QString currentEnvLanguage = Utils::getCurrentEnvLanguage();
     // 判断是维吾尔语或者藏语时
@@ -153,7 +161,7 @@ TermWidget::TermWidget(const TermProperties &properties, QWidget *parent) : QTer
     setFlowControlEnabled(!Settings::instance()->disableControlFlow());
 
     TermWidgetPage *parentPage = qobject_cast<TermWidgetPage *>(parent);
-    //qInfo() << parentPage << endl;
+    //qInfo() << parentPage;
     connect(this, &QTermWidget::uninstallTerminal, parentPage, &TermWidgetPage::uninstallTerminal);
 }
 
@@ -174,7 +182,7 @@ void TermWidget::initConnections()
 
     // 主题变化只能从公共方法发出信号通知全局
     connect(Service::instance(), &Service::changeColorTheme, this, &TermWidget::onColorThemeChanged);
-    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this, &TermWidget::onThemeChanged);
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &TermWidget::onThemeChanged);
 
     // 未找到搜索的匹配结果
     connect(this, &QTermWidget::sig_noMatchFound, this, &TermWidget::onSig_noMatchFound);
@@ -312,7 +320,7 @@ inline void TermWidget::onThemeChanged(DGuiApplicationHelper::ColorType themeTyp
     Q_UNUSED(themeType);
     if ("System Theme" == Settings::instance()->colorScheme()) {
         QString theme;
-        if (DApplicationHelper::DarkType == DApplicationHelper::instance()->themeType()) {
+        if (DGuiApplicationHelper::DarkType == DGuiApplicationHelper::instance()->themeType()) {
             theme = "Dark";
         } else {
             theme = "Light";
@@ -478,15 +486,11 @@ void TermWidget::addMenuActions(const QPoint &pos)
 
     m_menu->addSeparator();
 
-
-    DSplitter *splitter = qobject_cast<DSplitter *>(parentWidget());
-    int layer = getTermLayer();
-
-    if (1 == layer || (2 == layer && splitter && Qt::Horizontal == splitter->orientation()))
-        m_menu->addAction(tr("Horizontal split"), this, &TermWidget::onHorizontalSplit);
-
-    if (1 == layer || (2 == layer && splitter && Qt::Vertical == splitter->orientation()))
-        m_menu->addAction(tr("Vertical split"), this, &TermWidget::onVerticalSplit);
+    QAction *action = 0;
+    action = m_menu->addAction(tr("Horizontal split"), this, &TermWidget::onHorizontalSplit);
+    action->setEnabled(canSplit(Qt::Vertical));
+    action = m_menu->addAction(tr("Vertical split"), this, &TermWidget::onVerticalSplit);
+    action->setEnabled(canSplit(Qt::Horizontal));
 
     /******** Modify by n014361 wangpeili 2020-02-21: 增加关闭窗口和关闭其它窗口菜单    ****************/
     m_menu->addAction(QObject::tr("Close workspace"), this, &TermWidget::onCloseCurrWorkSpace);
@@ -552,14 +556,12 @@ void TermWidget::addMenuActions(const QPoint &pos)
 
 inline void TermWidget::onHorizontalSplit()
 {
-    getTermLayer();
     // menu关闭与分屏同时进行时，会导致QT计算光标位置异常。
     QTimer::singleShot(10, this, &TermWidget::splitHorizontal);
 }
 
 inline void TermWidget::onVerticalSplit()
 {
-    getTermLayer();
     // menu关闭与分屏同时进行时，会导致QT计算光标位置异常。
     QTimer::singleShot(10, this, &TermWidget::splitVertical);
 }
@@ -715,8 +717,8 @@ void TermWidget::setTheme(const QString &colorTheme)
     QString theme = colorTheme;
     // 跟随系统
     if ("System Theme" == colorTheme) {
-        DApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::UnknownType);
-        if (DApplicationHelper::DarkType == DApplicationHelper::instance()->themeType()) {
+        DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::UnknownType);
+        if (DGuiApplicationHelper::DarkType == DGuiApplicationHelper::instance()->themeType()) {
             theme = "Dark";
         } else {
             theme = "Light";
@@ -731,7 +733,7 @@ void TermWidget::setTheme(const QString &colorTheme)
         if ("Light" == Settings::instance()->themeSetting->value("CustomTheme/TitleStyle")) {
             systemTheme = DGuiApplicationHelper::LightType;
         }
-        DApplicationHelper::instance()->setPaletteType(systemTheme);
+        DGuiApplicationHelper::instance()->setPaletteType(systemTheme);
         setColorScheme(theme);
         return;
     }
@@ -819,18 +821,6 @@ void TermWidget::setDeleteMode(const EraseMode &deleteMode)
         return;
     }
     QTermWidget::setDeleteMode(&ch, length);
-}
-
-int TermWidget::getTermLayer()
-{
-    int layer = 1;
-    QWidget *currentW = this;
-    while (currentW->parentWidget() != parentPage()) {
-        layer++;
-        currentW = currentW->parentWidget();
-    }
-    qInfo() << "getTermLayer = " << layer;
-    return  layer;
 }
 
 void TermWidget::setTabFormat(const QString &tabFormat)
@@ -1030,6 +1020,38 @@ bool TermWidget::isInRemoteServer()
     return false;
 }
 
+bool TermWidget::canSplit(Qt::Orientation ori) {
+    qDebug() << "CanSplit:" << ori;
+    QSplitter *splitter = qobject_cast<QSplitter *>(this->parentWidget());
+    int minimumSize = ori == Qt::Horizontal ? TermWidget::MIN_WIDTH : TermWidget::MIN_HEIGHT;
+    if (splitter) {
+        if (splitter->orientation() == ori) {
+            QList<int> sizes = splitter->sizes();
+            // new term has same size portion as the current one.
+            sizes.append(sizes.at(splitter->indexOf(this)));
+
+            double sum = 0;
+            for (int i = 0; i < sizes.count(); i++) {
+                sum += sizes.at(i);
+            }
+
+            for(int i = 0; i < sizes.count(); i++) {
+                int totalSize = ori == Qt::Horizontal ? splitter->width() : splitter->height();
+                int actualSize = (totalSize) * (sizes.at(i) / sum);
+                if (actualSize < minimumSize)
+                    return false;
+            }
+        } else {
+            int splitterSize = ori == Qt::Horizontal ? splitter->width() : splitter->height();
+            if (splitterSize / 2.0 < minimumSize)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+
 void TermWidget::setTermOpacity(qreal opacity)
 {
     //这里再次判断一遍，因为刚启动时，还是需要判断一次当前是否开启了窗口特效
@@ -1127,6 +1149,10 @@ void TermWidget::onSettingValueChanged(const QString &keyName)
         return;
     }
 
+    if ("advanced.cursor.set_cursor_position" == keyName) {
+        enableSetCursorPosition(Settings::instance()->enableSetCursorPosition());
+    }
+
     if ("advanced.scroll.scroll_on_key" == keyName) {
         setPressingScroll(Settings::instance()->PressingScroll());
         return;
@@ -1159,6 +1185,20 @@ void TermWidget::onSettingValueChanged(const QString &keyName)
 
     if ("advanced.shell.disable_ctrl_flow" == keyName) {
         setFlowControlEnabled(!Settings::instance()->disableControlFlow());
+        return;
+    }
+
+    if ("advanced.debuginfod.enable_debuginfod" == keyName) {
+        if (!hasRunningProcess()) {
+            if (Settings::instance()->enableDebuginfod()) {
+                sendText(QString("test -z $DEBUGINFOD_URLS && export DEBUGINFOD_URLS=\"%1\"\n").arg(Settings::instance()->debuginfodUrls()));
+            } else {
+                sendText("test -z $DEBUGINFOD_URLS || unset DEBUGINFOD_URLS\n");
+            }
+        } else {
+            // Todo(ArchieMeng): Should handle the situation when there is a running process. It should wait until all running processes being exited.
+            showShellMessage(tr("The debuginfod settings will be effective after restart"));
+        }
         return;
     }
 

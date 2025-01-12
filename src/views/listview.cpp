@@ -427,6 +427,20 @@ void ListView::onCustomItemModify(const QString &key, bool isFocusOn)
     m_pdlg->show();
 }
 
+/**
+ * @brief 接收 DGuiApplicationHelper::sizeModeChanged() 信号, 根据不同的布局模式调整
+ *      当前界面的布局. 只能在界面创建完成后调用.
+ */
+void ListView::updateSizeMode()
+{
+#ifdef DTKWIDGET_CLASS_DSizeMode
+    // 遍历子项进行更新
+    for (ItemWidget *item : m_itemList) {
+        item->updateSizeMode();
+    }
+#endif
+}
+
 inline void ListView::onCustomCommandOptDlgFinished(int result)
 {
     int tempResult = result;
@@ -617,6 +631,11 @@ void ListView::initUI()
 
     m_mainWidget->setLayout(m_mainLayout);
     setWidget(m_mainWidget);
+
+#ifdef DTKWIDGET_CLASS_DSizeMode
+    updateSizeMode();
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::sizeModeChanged, this, &ListView::updateSizeMode);
+#endif
 }
 
 void ListView::setItemIcon(ItemFuncType type, ItemWidget *item)
@@ -638,6 +657,8 @@ void ListView::setItemIcon(ItemFuncType type, ItemWidget *item)
         break;
     case ItemFuncType_UngroupedItem:
         item->setIcon("dt_server");
+        break;
+    default:
         break;
     }
 }
@@ -671,7 +692,7 @@ static inline bool comparator(ItemWidget *item1, ItemWidget *item2)
 
 int ListView::getWidgetIndex(ItemWidget *itemWidget)
 {
-    qSort(m_itemList.begin(), m_itemList.end(), comparator);
+    std::sort(m_itemList.begin(), m_itemList.end(), comparator);
     // 从0开始
     int index = 0;
     int currentIndex = 0;
@@ -701,9 +722,9 @@ void ListView::setFocusFromeIndex(int currentIndex, ListFocusType focusType)
     else if (ListFocusEnd == focusType)
         index = this->count() - 1;
     else
-        qInfo() << "index:" << index << endl;
+        qInfo() << "index:" << index;
 
-    qInfo() << "focus index:" << index << endl;
+    qInfo() << "focus index:" << index;
 
     // index >= 0 < 最大数量
     // 最上
@@ -751,7 +772,7 @@ void ListView::setFocusFromeIndex(int currentIndex, ListFocusType focusType)
                     m_scrollPostion += (count - 1) * listItemHeight;
                 } else {
                     m_scrollPostion = verticalScrollBar()->value();
-                    qInfo() << "m_scrollPostion" << m_scrollPostion << endl;
+                    qInfo() << "m_scrollPostion" << m_scrollPostion;
                 }
             }
         }
@@ -850,6 +871,8 @@ void ListView::deleteItem(const QString &key, ItemFuncType type)
         break;
     case ItemFuncType_Group:
         title = tr("Cancel Server Group");
+        break;
+    default:
         break;
     }
     QString alertText;
